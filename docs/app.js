@@ -1,17 +1,26 @@
 const feeds = {
-  Feed1: "https://rss.app/feeds/v1.1/JM6P6Jn44YAYJ3Xv.json",
-  Feed2: "https://rss.app/feeds/v1.1/h98rJD7GkZkhpjgQ.json",
+  BearPigManDog: "https://rss.app/feeds/v1.1/JM6P6Jn44YAYJ3Xv.json",
+  IncomeSharks: "https://rss.app/feeds/v1.1/h98rJD7GkZkhpjgQ.json",
 };
 
-async function loadFeed(containerId, url) {
+// CORS-safe proxy
+const PROXY = "https://api.allorigins.win/raw?url=";
+
+async function loadFeed(containerId, feedUrl) {
+  const list = document.querySelector(`#${containerId} .feed`);
+  list.innerHTML = "<li>Loading…</li>";
+
   try {
-    const response = await fetch(url);
+    const response = await fetch(PROXY + encodeURIComponent(feedUrl));
+    if (!response.ok) throw new Error("Network response not OK");
+
     const data = await response.json();
 
-    const list = document.querySelector(`#${containerId} .feed`);
-    list.innerHTML = "";
+    const items = Array.isArray(data.items)
+      ? data.items.slice(0, 10)
+      : [];
 
-    const items = Array.isArray(data.items) ? data.items.slice(0, 10) : [];
+    list.innerHTML = "";
 
     if (items.length === 0) {
       list.innerHTML = "<li>No posts found.</li>";
@@ -19,23 +28,38 @@ async function loadFeed(containerId, url) {
     }
 
     items.forEach(item => {
+      const title =
+        item.title ||
+        item.content_text ||
+        item.summary ||
+        "Untitled post";
+
+      const link = item.url || item.link || "#";
+
+      const date =
+        item.date_published ||
+        item.pubDate ||
+        item.published;
+
       const li = document.createElement("li");
       li.innerHTML = `
-        <a href="${item.url}" target="_blank" rel="noopener">
-          ${item.title || item.contentSnippet || "No title"}
+        <a href="${link}" target="_blank" rel="noopener">
+          ${title}
           <span class="time">
-            ${item.pubDate ? new Date(item.pubDate).toLocaleString() : ""}
+            ${date ? new Date(date).toLocaleString() : ""}
           </span>
         </a>
       `;
+
       list.appendChild(li);
     });
 
-  } catch (error) {
-    const list = document.querySelector(`#${containerId} .feed`);
+  } catch (err) {
+    console.error("Feed load error:", err);
     list.innerHTML = "<li>Error loading feed.</li>";
-    console.error("Feed error:", error);
   }
 }
 
-Object.entries(feeds).forEach(([id, url]) => loadFeed(id, url));
+Object.entries(feeds).forEach(([id, url]) =>
+  loadFeed(id, url)
+);
