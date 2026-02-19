@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>X Feed</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xfeed - Top Posts</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>X Feed</h1>
+    <header>
+        <h1>Xfeed - Top Posts</h1>
+    </header>
 
-  <section id="BearPigManDog">
-  <h2>@BearPigManDog</h2>
-  <ul class="feed"></ul>
-</section>
+    <section id="feeds">
+        <div class="feed" id="feed1">
+            <h2>Author 1</h2>
+            <ul class="posts"></ul>
+        </div>
+        <div class="feed" id="feed2">
+            <h2>Author 2</h2>
+            <ul class="posts"></ul>
+        </div>
+    </section>
 
-<section id="IncomeSharks">
-  <h2>@IncomeSharks</h2>
-  <ul class="feed"></ul>
-</section>
-
-  <footer>
-    <p>Last updated automatically · Data via RSS</p>
-  </footer>
-
-  <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
