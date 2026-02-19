@@ -1,45 +1,41 @@
 const feeds = {
-  BearPigManDog: "https://rsshub.app/twitter/user/BearPigManDog",
-  IncomeSharks: "https://rsshub.app/twitter/user/IncomeSharks"
+  Feed1: "https://rss.app/feeds/v1.1/JM6P6Jn44YAYJ3Xv.json",
+  Feed2: "https://rss.app/feeds/v1.1/h98rJD7GkZkhpjgQ.json",
 };
 
-const RSS_TO_JSON = "https://api.rss2json.com/v1/api.json?rss_url=";
-
-async function loadFeed(user, url) {
+async function loadFeed(containerId, url) {
   try {
-    const response = await fetch(RSS_TO_JSON + encodeURIComponent(url));
+    const response = await fetch(url);
     const data = await response.json();
 
-    const list = document.querySelector(`#${user} .feed`);
+    const list = document.querySelector(`#${containerId} .feed`);
     list.innerHTML = "";
 
-    if (!data.items || data.items.length === 0) {
+    const items = Array.isArray(data.items) ? data.items.slice(0, 10) : [];
+
+    if (items.length === 0) {
       list.innerHTML = "<li>No posts found.</li>";
       return;
     }
 
-    data.items.slice(0, 10).forEach(item => {
+    items.forEach(item => {
       const li = document.createElement("li");
-
       li.innerHTML = `
-        <a href="${item.link}" target="_blank" rel="noopener">
-          ${item.title}
+        <a href="${item.url}" target="_blank" rel="noopener">
+          ${item.title || item.contentSnippet || "No title"}
           <span class="time">
-            ${new Date(item.pubDate).toLocaleString()}
+            ${item.pubDate ? new Date(item.pubDate).toLocaleString() : ""}
           </span>
         </a>
       `;
-
       list.appendChild(li);
     });
 
-  } catch (err) {
-    const list = document.querySelector(`#${user} .feed`);
+  } catch (error) {
+    const list = document.querySelector(`#${containerId} .feed`);
     list.innerHTML = "<li>Error loading feed.</li>";
-    console.error(err);
+    console.error("Feed error:", error);
   }
 }
 
-Object.entries(feeds).forEach(([user, url]) => {
-  loadFeed(user, url);
-});
+Object.entries(feeds).forEach(([id, url]) => loadFeed(id, url));
